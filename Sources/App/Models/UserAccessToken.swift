@@ -1,14 +1,14 @@
 import Authentication
 import Crypto
-import FluentSQLite
+import FluentPostgreSQL
 import Vapor
 
 /// An ephermal authentication token that identifies a registered user.
-final class UserToken: SQLiteModel {
+final class UserAccessToken: SQLiteModel {
     /// Creates a new `UserToken` for a given user.
-    static func create(userID: User.ID) throws -> UserToken {
+    static func create(userID: User.ID) throws -> UserAccessToken {
         // generate a random 128-bit, base64-encoded string.
-        let string = try CryptoRandom().generateData(count: 16).base64EncodedString()
+        let string = try CryptoRandom().generateData(count: 32).base64EncodedString()
         // init a new `UserToken` from that string.
         return .init(string: string, userID: userID)
     }
@@ -38,34 +38,34 @@ final class UserToken: SQLiteModel {
     }
 }
 
-extension UserToken {
+extension UserAccessToken {
     /// Fluent relation to the user that owns this token.
-    var user: Parent<UserToken, User> {
+    var user: Parent<UserAccessToken, User> {
         return parent(\.userID)
     }
 }
 
 /// Allows this model to be used as a TokenAuthenticatable's token.
-extension UserToken: Token {
+extension UserAccessToken: Token {
     /// See `Token`.
     typealias UserType = User
     
     /// See `Token`.
-    static var tokenKey: WritableKeyPath<UserToken, String> {
+    static var tokenKey: WritableKeyPath<UserAccessToken, String> {
         return \.string
     }
     
     /// See `Token`.
-    static var userIDKey: WritableKeyPath<UserToken, User.ID> {
+    static var userIDKey: WritableKeyPath<UserAccessToken, User.ID> {
         return \.userID
     }
 }
 
 /// Allows `UserToken` to be used as a Fluent migration.
-extension UserToken: Migration {
+extension UserAccessToken: Migration {
     /// See `Migration`.
     static func prepare(on conn: SQLiteConnection) -> Future<Void> {
-        return SQLiteDatabase.create(UserToken.self, on: conn) { builder in
+        return SQLiteDatabase.create(UserAccessToken.self, on: conn) { builder in
             builder.field(for: \.id, isIdentifier: true)
             builder.field(for: \.string)
             builder.field(for: \.userID)
@@ -76,7 +76,7 @@ extension UserToken: Migration {
 }
 
 /// Allows `UserToken` to be encoded to and decoded from HTTP messages.
-extension UserToken: Content { }
+extension UserAccessToken: Content { }
 
 /// Allows `UserToken` to be used as a dynamic parameter in route definitions.
-extension UserToken: Parameter { }
+extension UserAccessToken: Parameter { }
