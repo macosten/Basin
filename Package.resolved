@@ -56,6 +56,15 @@
         }
       },
       {
+        "package": "FluentPostgreSQL",
+        "repositoryURL": "https://github.com/vapor/fluent-postgresql.git",
+        "state": {
+          "branch": null,
+          "revision": "8e3eb9d24d54ac58c8d04c194ad6b24f0b1b667e",
+          "version": "1.0.0"
+        }
+      },
+      {
         "package": "FluentSQLite",
         "repositoryURL": "https://github.com/vapor/fluent-sqlite.git",
         "state": {
@@ -80,6 +89,15 @@
           "branch": null,
           "revision": "bd7736c5f28e48ed8b683dcc9df3dcd346064c2b",
           "version": "3.0.3"
+        }
+      },
+      {
+        "package": "PostgreSQL",
+        "repositoryURL": "https://github.com/vapor/postgresql.git",
+        "state": {
+          "branch": null,
+          "revision": "41cec2846f9cdd8233675da0d256efa3b8d62b21",
+          "version": "1.4.1"
         }
       },
       {

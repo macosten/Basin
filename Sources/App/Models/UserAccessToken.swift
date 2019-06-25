@@ -4,7 +4,7 @@ import FluentPostgreSQL
 import Vapor
 
 /// An ephermal authentication token that identifies a registered user.
-final class UserAccessToken: SQLiteModel {
+final class UserAccessToken: PostgreSQLModel {
     /// Creates a new `UserToken` for a given user.
     static func create(userID: User.ID) throws -> UserAccessToken {
         // generate a random 128-bit, base64-encoded string.
@@ -36,6 +36,14 @@ final class UserAccessToken: SQLiteModel {
         self.expiresAt = Date.init(timeInterval: 60 * 60 * 5, since: .init())
         self.userID = userID
     }
+    
+    struct Wrapped: Content {
+        let access_token : String
+        
+        init (from accessToken: UserAccessToken){
+            access_token = accessToken.string
+        }
+    }
 }
 
 extension UserAccessToken {
@@ -64,19 +72,23 @@ extension UserAccessToken: Token {
 /// Allows `UserToken` to be used as a Fluent migration.
 extension UserAccessToken: Migration {
     /// See `Migration`.
-    static func prepare(on conn: SQLiteConnection) -> Future<Void> {
-        return SQLiteDatabase.create(UserAccessToken.self, on: conn) { builder in
-            builder.field(for: \.id, isIdentifier: true)
-            builder.field(for: \.string)
-            builder.field(for: \.userID)
-            builder.field(for: \.expiresAt)
+    static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
+        return PostgreSQLDatabase.create(UserAccessToken.self, on: conn) { builder in
+            //builder.field(for: \.id, isIdentifier: true)
+            //builder.field(for: \.string)
+            //builder.field(for: \.userID)
+            //builder.field(for: \.expiresAt)
+            try addProperties(to: builder)
             builder.reference(from: \.userID, to: \User.id)
         }
     }
 }
 
 /// Allows `UserToken` to be encoded to and decoded from HTTP messages.
-extension UserAccessToken: Content { }
+extension UserAccessToken: Content {
+    
+    
+}
 
 /// Allows `UserToken` to be used as a dynamic parameter in route definitions.
 extension UserAccessToken: Parameter { }
