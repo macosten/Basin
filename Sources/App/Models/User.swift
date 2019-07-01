@@ -2,7 +2,7 @@ import Authentication
 import FluentPostgreSQL
 import Vapor
 
-/// A registered user, capable of owning todo items.
+/// A registered user.
 final class User: PostgreSQLModel {
     /// User's unique identifier.
     /// Can be `nil` if the user has not been saved yet.
@@ -16,6 +16,10 @@ final class User: PostgreSQLModel {
     
     /// BCrypt hash of the user's password.
     var passwordHash: String
+    
+    var info: Children<User, UserInformation> {
+        return children(\UserInformation.id)
+    }
     
     /// Creates a new `User`.
     init(id: Int? = nil, name: String, email: String, passwordHash: String) {
