@@ -24,7 +24,7 @@ class TestController: RouteCollection {
             return req.future("You are not logged in.")
         }
         
-        return req.future("Hello, \(authenticatedUser.name).")
+        return req.future("Hello, \(authenticatedUser.name). This is Memevey. Copy and paste Memevey to ten other applications or she will never be a meme...")
         
     }
     

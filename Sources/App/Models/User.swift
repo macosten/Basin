@@ -8,7 +8,7 @@ final class User: PostgreSQLModel {
     /// Can be `nil` if the user has not been saved yet.
     var id: Int?
     
-    /// User's full name.
+    /// User's name.
     var name: String
     
     /// User's email address.

@@ -99,7 +99,7 @@ struct CreateUserRequest: Content, Validatable {
         
         validations.add("Password and password verification must match") { createUserRequest in //A complex validation:
             guard createUserRequest.password == createUserRequest.verifyPassword else {
-                throw Abort(.internalServerError, reason: "Password and password verification must match.")
+                throw Abort(.badRequest, reason: "Password and password verification must match.")
             }
         }
         return validations
