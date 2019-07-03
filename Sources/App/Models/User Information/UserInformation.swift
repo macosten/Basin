@@ -55,7 +55,15 @@ final class UserInformation: PostgreSQLModel {
         let a = sin(deltaLat/2) * sin(deltaLat/2) +
                 sin(deltaLon/2) * sin(deltaLon/2) * cos(myLatitudeRadians) * cos(otherLatitudeRadians)
         let c = 2 * atan2(sqrt(a), sqrt(1-a))
-        return earthRadiusInMeters * c
+        let distanceInMeters = earthRadiusInMeters * c
+        
+        //Return a converted value based on the unit type specified by the unit enum.
+        switch unit {
+        case .meters: return distanceInMeters
+        case .kilometers: return distanceInMeters / 1000
+        case .miles: return distanceInMeters / 1609.344
+        }
+        
     }
     
 }
