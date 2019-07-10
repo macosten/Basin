@@ -5,12 +5,12 @@ import FluentPostGIS
 
 class MatchController: RouteCollection {
     func boot(router: Router) throws {
-        let pingRoute = router.grouped("api", "match")
+        let mainRoute = router.grouped("api", "match")
         
         //Establish the token-protected route.
         let guardAuthMiddleware = User.guardAuthMiddleware()
         let tokenAuthMiddleware = User.tokenAuthMiddleware()
-        let tokenProtected = pingRoute.grouped(tokenAuthMiddleware, guardAuthMiddleware)
+        let tokenProtected = mainRoute.grouped(tokenAuthMiddleware, guardAuthMiddleware)
         
         //Mark -- Token-protected routes.
         tokenProtected.get("fetch", use: theMatchingFunction)
