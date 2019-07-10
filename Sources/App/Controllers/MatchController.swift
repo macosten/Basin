@@ -51,12 +51,6 @@ class MatchController: RouteCollection {
             //In the future, we may also want to sort these somehow, and in fact we probably will. For now, we won't...
             return matchingUsers
         }
-        //Potential addition: "Look for people within a distance of ___" -- for now, this will be hardcoded or something
-        
-        
-        
-        //Query every user within their user's preference
-   
         
     }
     

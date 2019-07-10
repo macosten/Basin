@@ -72,10 +72,10 @@ final class UserInformation: PostgreSQLModel {
 extension UserInformation: Migration {
     static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
         return PostgreSQLDatabase.create(UserInformation.self, on: conn) { builder in
-            builder.field(for: \.id, isIdentifier: true)
-            builder.field(for: \.userID)
+            //builder.field(for: \.id, isIdentifier: true)
+            //builder.field(for: \.userID)
             
-            builder.field(for: \.location)
+            //builder.field(for: \.location)
             
             try addProperties(to: builder)
             builder.unique(on: \.id)
