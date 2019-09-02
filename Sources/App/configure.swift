@@ -1,6 +1,5 @@
 import Authentication
 import FluentPostgreSQL
-import FluentPostGIS
 import Vapor
 
 /// Called before your application initializes.
@@ -8,9 +7,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     // Register providers first
     try services.register(FluentPostgreSQLProvider())
     try services.register(AuthenticationProvider())
-    //PostGIS
-    try services.register(FluentPostGISProvider())
-    
+
     // Register routes to the router
     let router = EngineRouter.default()
     try routes(router)
@@ -36,7 +33,6 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     //MARK -- Make sure that every single model that gets saved to the database has a migration.
     var migrations = MigrationConfig()
     migrations.add(model: User.self, database: .psql)
-    migrations.add(model: UserInformation.self, database: .psql)
     migrations.add(model: UserAccessToken.self, database: .psql)
     services.register(migrations)
 

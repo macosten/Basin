@@ -6,8 +6,6 @@
 </ul>
 <p><b>Goals:</b></p>
 <ul>
-    <li>Users own a UserInformation that contains their information. To start, this will just be their geograpic location.</li>
-    <li>The first version of "The Algorithm" will query users based on geographic proximity. This is where PostGIS is vital.</li>
     <li>It's possible that location eventually becomes irrelevant. Do not overuse PostGIS.</li>
 </ul>
 

@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Conflux",
+    name: "Basin",
     dependencies: [
         // 💧 A server-side Swift web framework.
         .package(url: "https://github.com/vapor/vapor.git", from: "3.0.0"),
@@ -12,15 +12,12 @@ let package = Package(
 
         // 👤 Authentication and Authorization layer for Fluent.
         .package(url: "https://github.com/vapor/auth.git", from: "2.0.0"),
-        
-        // Swift PostGIS support for FluentPostgreSQL and Vapor.
-        .package(url: "https://github.com/plarson/fluent-postgis.git", .branch("master"))
-        
-        //Todo: add Imperial for federated login.
+
+        //Todo: add Imperial for federated login?
         
     ],
     targets: [
-        .target(name: "App", dependencies: ["Authentication", "FluentPostgreSQL", "Vapor", "FluentPostGIS"]),
+        .target(name: "App", dependencies: ["Authentication", "FluentPostgreSQL", "Vapor"]),
         .target(name: "Run", dependencies: ["App"]),
         .testTarget(name: "AppTests", dependencies: ["App"])
     ]
