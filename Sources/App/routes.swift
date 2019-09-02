@@ -10,7 +10,7 @@ public func routes(_ router: Router) throws {
     let testController = TestController()
     try testController.boot(router: router)
     
-    let matchController = MatchController()
-    try matchController.boot(router: router)
+    let postController = PostController()
+    try postController.boot(router: router)
     
 }
