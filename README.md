@@ -11,7 +11,7 @@
     <li>It's possible that location eventually becomes irrelevant. Do not overuse PostGIS.</li>
 </ul>
 
-# Conflux
+# Basin
 
 ## Installing:
 
