@@ -33,8 +33,8 @@ final class Post : PostgreSQLModel {
         return siblings(related: User.self, through: PostUserLikePivot.self)
     }
     
-    var dislikingUsers : Siblings<Post, User, PostUserDisikePivot>{
-        return siblings(related: User.self, through: PostUserDisikePivot.self)
+    var dislikingUsers : Siblings<Post, User, PostUserDislikePivot>{
+        return siblings(related: User.self, through: PostUserDislikePivot.self)
     }
 
     //The "Who wants to get involved in this idea?" group.
@@ -47,8 +47,6 @@ final class Post : PostgreSQLModel {
         return children(\PostComment.id)
     }
     
-    
-
 }
 
 //The migration associated with this model.

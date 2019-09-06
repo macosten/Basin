@@ -10,7 +10,13 @@ import FluentPostgreSQL
 
 //For Sibling relationships, pivots are required.
 //This is basically just an object that acts as a link of sorts.
-struct PostUserDisikePivot : PostgreSQLModel, ModifiablePivot {
+struct PostUserDislikePivot : PostgreSQLModel, ModifiablePivot {
+    
+    typealias Left = Post
+    typealias Right = User
+    
+    static var leftIDKey: LeftIDKey = \.postID
+    static var rightIDKey: RightIDKey = \.userID
     
     var id: Int?
     var postID: Int
@@ -22,10 +28,14 @@ struct PostUserDisikePivot : PostgreSQLModel, ModifiablePivot {
         userID = try right.requireID()
     }
     
-    typealias Left = Post
-    typealias Right = User
-    
-    static var leftIDKey: LeftIDKey = \.postID
-    static var rightIDKey: RightIDKey = \.userID
-    
+}
+//The migration associated with this model.
+extension PostUserDislikePivot: Migration {
+    /// See `Migration`.
+    static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
+        return PostgreSQLDatabase.create(PostUserDislikePivot.self, on: conn) { builder in
+            builder.field(for: \.id, isIdentifier: true)
+            try addProperties(to: builder)
+        }
+    }
 }

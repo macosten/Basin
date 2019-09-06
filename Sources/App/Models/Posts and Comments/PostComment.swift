@@ -34,11 +34,14 @@ final class PostComment : PostgreSQLModel {
     var textContent : String
     
     // MARK -- Points/Likes/Dislikes
-    //var likers : Siblings<PostComment, Us
-    //var dislikes : UInt
+    var likingUsers : Siblings<PostComment, User, PostCommentUserLikePivot>{
+        return siblings(related: User.self, through: PostCommentUserLikePivot.self)
+    }
     
-    
-    
+    var dislikingUsers : Siblings<PostComment, User, PostCommentUserDislikePivot>{
+        return siblings(related: User.self, through: PostCommentUserDislikePivot.self)
+    }
+
 }
 
 

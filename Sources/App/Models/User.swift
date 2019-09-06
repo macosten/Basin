@@ -72,8 +72,9 @@ extension User: Migration {
             builder.field(for: \.name)
             builder.field(for: \.email)
             builder.field(for: \.passwordHash)
-            //try addProperties(to: builder)
+            try addProperties(to: builder)
             builder.unique(on: \.email)
         }
     }
 }
+
