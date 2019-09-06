@@ -32,8 +32,14 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     /// Configure migrations.
     //MARK -- Make sure that every single model that gets saved to the database has a migration.
     var migrations = MigrationConfig()
+    //User Migrations
     migrations.add(model: User.self, database: .psql)
     migrations.add(model: UserAccessToken.self, database: .psql)
+    
+    //Post and content migrations
+    migrations.add(model: Post.self, database: .psql)
+    migrations.add(model: PostComment.self, database: .psql)
+    
     services.register(migrations)
 
 

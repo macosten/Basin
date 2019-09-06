@@ -21,7 +21,7 @@ class TestController: RouteCollection {
         let user = try? req.requireAuthenticated(User.self)
         
         guard let authenticatedUser = user else {
-            return req.future("You are not logged in.")
+            return req.future("You are not logged in (but can somehow get this message returned to you, which is a problem).")
         }
         
         return req.future("Hello, \(authenticatedUser.name). This is Memevey. Copy and paste Memevey to ten other applications or she will never be a meme...")
