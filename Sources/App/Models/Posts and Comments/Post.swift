@@ -29,17 +29,17 @@ final class Post : PostgreSQLModel {
     //var videoContent : URL?
     
     //"Points" given by up/downs. These will track the general popularity of an idea.
-    var likingUsers : Siblings<Post, User, PostUserLikePivot>{
-        return siblings(related: User.self, through: PostUserLikePivot.self)
+    var likingUsers : Siblings<Post, User, PostUserPivot>{
+        return siblings(related: User.self, through: PostUserPivot.self)
     }
     
-    var dislikingUsers : Siblings<Post, User, PostUserDislikePivot>{
-        return siblings(related: User.self, through: PostUserDislikePivot.self)
+    var dislikingUsers : Siblings<Post, User, PostUserPivot>{
+        return siblings(related: User.self, through: PostUserPivot.self)
     }
 
     //The "Who wants to get involved in this idea?" group.
-    var involvedUsers : Siblings<Post, User, PostUserInvolvePivot>{
-        return siblings(related: User.self, through: PostUserInvolvePivot.self)
+    var involvedUsers : Siblings<Post, User, PostUserPivot>{
+        return siblings(related: User.self, through: PostUserPivot.self)
     }
     
     //Comments on a post.
@@ -54,7 +54,6 @@ extension Post: Migration {
     /// See `Migration`.
     static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
         return PostgreSQLDatabase.create(Post.self, on: conn) { builder in
-            builder.field(for: \.id, isIdentifier: true)
             try addProperties(to: builder)
         }
     }

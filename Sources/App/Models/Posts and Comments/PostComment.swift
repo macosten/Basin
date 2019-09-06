@@ -34,12 +34,12 @@ final class PostComment : PostgreSQLModel {
     var textContent : String
     
     // MARK -- Points/Likes/Dislikes
-    var likingUsers : Siblings<PostComment, User, PostCommentUserLikePivot>{
-        return siblings(related: User.self, through: PostCommentUserLikePivot.self)
+    var likingUsers : Siblings<PostComment, User, PostCommentUserPivot>{
+        return siblings(related: User.self, through: PostCommentUserPivot.self)
     }
     
-    var dislikingUsers : Siblings<PostComment, User, PostCommentUserDislikePivot>{
-        return siblings(related: User.self, through: PostCommentUserDislikePivot.self)
+    var dislikingUsers : Siblings<PostComment, User, PostCommentUserPivot>{
+        return siblings(related: User.self, through: PostCommentUserPivot.self)
     }
 
 }
@@ -50,7 +50,7 @@ extension PostComment: Migration {
     /// See `Migration`.
     static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
         return PostgreSQLDatabase.create(PostComment.self, on: conn) { builder in
-            builder.field(for: \.id, isIdentifier: true)
+            //builder.field(for: \.id, isIdentifier: true) //addProperties already dows this. If it breaks, add them all manually using the builder.field() methods.
             try addProperties(to: builder)
         }
     }

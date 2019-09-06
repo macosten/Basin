@@ -8,7 +8,7 @@
 import Vapor
 import FluentPostgreSQL
 
-struct PostCommentUserLikePivot : PostgreSQLModel, ModifiablePivot {
+struct PostCommentUserPivot : PostgreSQLModel, ModifiablePivot {
     
     typealias Left = PostComment
     typealias Right = User
@@ -27,11 +27,10 @@ struct PostCommentUserLikePivot : PostgreSQLModel, ModifiablePivot {
     
 }
 //The migration associated with this model.
-extension PostCommentUserLikePivot: Migration {
+extension PostCommentUserPivot: Migration {
     /// See `Migration`.
     static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
-        return PostgreSQLDatabase.create(PostCommentUserLikePivot.self, on: conn) { builder in
-            builder.field(for: \.id, isIdentifier: true)
+        return PostgreSQLDatabase.create(PostCommentUserPivot.self, on: conn) { builder in
             try addProperties(to: builder)
         }
     }

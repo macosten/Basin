@@ -68,10 +68,6 @@ extension User: Migration {
     /// See `Migration`.
     static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
         return PostgreSQLDatabase.create(User.self, on: conn) { builder in
-            builder.field(for: \.id, isIdentifier: true)
-            builder.field(for: \.name)
-            builder.field(for: \.email)
-            builder.field(for: \.passwordHash)
             try addProperties(to: builder)
             builder.unique(on: \.email)
         }

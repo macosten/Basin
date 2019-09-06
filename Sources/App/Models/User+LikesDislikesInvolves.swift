@@ -11,26 +11,26 @@ import FluentPostgreSQL
 extension User {
 
     //For Posts
-    var likedPosts : Siblings<User, Post, PostUserLikePivot>{
-        return siblings(related: Post.self, through: PostUserLikePivot.self)
+    var likedPosts : Siblings<User, Post, PostUserPivot>{
+        return siblings(related: Post.self, through: PostUserPivot.self)
     }
     
-    var dislikedPosts : Siblings<User, Post, PostUserDislikePivot>{
-        return siblings(related: Post.self, through: PostUserDislikePivot.self)
+    var dislikedPosts : Siblings<User, Post, PostUserPivot>{
+        return siblings(related: Post.self, through: PostUserPivot.self)
     }
     
-    var involvedPosts : Siblings<User, Post, PostUserInvolvePivot>{
-        return siblings(related: Post.self, through: PostUserInvolvePivot.self)
+    var involvedPosts : Siblings<User, Post, PostUserPivot>{
+        return siblings(related: Post.self, through: PostUserPivot.self)
     }
     
     //For comments
     
-    var likedComments : Siblings<User, PostComment, PostCommentUserLikePivot>{
-        return siblings(related: PostComment.self, through: PostCommentUserLikePivot.self)
+    var likedComments : Siblings<User, PostComment, PostCommentUserPivot>{
+        return siblings(related: PostComment.self, through: PostCommentUserPivot.self)
     }
     
-    var dislikedComments : Siblings<User, PostComment, PostCommentUserDislikePivot>{
-        return siblings(related: PostComment.self, through: PostCommentUserDislikePivot.self)
+    var dislikedComments : Siblings<User, PostComment, PostCommentUserPivot>{
+        return siblings(related: PostComment.self, through: PostCommentUserPivot.self)
     }
     
 }

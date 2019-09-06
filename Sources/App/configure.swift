@@ -41,12 +41,8 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     migrations.add(model: PostComment.self, database: .psql)
     
     //Pivot migrations
-    migrations.add(model: PostUserLikePivot.self, database: .psql)
-    migrations.add(model: PostUserDislikePivot.self, database: .psql)
-    migrations.add(model: PostUserInvolvePivot.self, database: .psql)
-    migrations.add(model: PostCommentUserLikePivot.self, database: .psql)
-    migrations.add(model: PostCommentUserDislikePivot.self, database: .psql)
-    
+    migrations.add(model: PostUserPivot.self, database: .psql)
+    migrations.add(model: PostCommentUserPivot.self, database: .psql)
     
     services.register(migrations)
 
