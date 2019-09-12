@@ -42,7 +42,7 @@ final class AuthController : RouteCollection {
     }
     
     /// Creates a new user.
-    func register(_ req: Request) throws -> Future<HTTPResponse> {
+    func register(_ req: Request) throws -> Future<Status> {
         // decode request content
         return try req.content.decode(CreateUserRequest.self).flatMap { user -> Future<User> in
             // perform all appropriate validations. See CreateUserRequest.validations().
@@ -53,17 +53,17 @@ final class AuthController : RouteCollection {
             // save new user
             return User(id: nil, name: user.name, email: user.email, passwordHash: hash)
                 .save(on: req)
-        }.returnOkay()
+        }.returnOkayStatus()
     }
     
-    func logout(_ req: Request) throws -> Future<HTTPResponse> {
+    func logout(_ req: Request) throws -> Future<Status> {
         //Let the user get auth'd and get that user.
         let user = try req.requireAuthenticated(User.self)
         //Delete all of the tokens that belong to this user.
         //Note that if you want to just log out from one device, you should have that device merely delete its own tokens. The access tokens themselves should expire after a while anyway.
         return try UserAccessToken.query(on: req)
                 .filter(\.userID, .equal, user.requireID()).delete()
-                .returnOkay()
+                .returnOkayStatus()
         
     }
     
