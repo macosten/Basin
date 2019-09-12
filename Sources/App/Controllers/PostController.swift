@@ -16,6 +16,9 @@ class PostController: RouteCollection {
         tokenProtected.get("listAllPosts", use: listAllPosts)
         tokenProtected.get("listResolvedPosts", use: listResolvedPosts)
         
+        tokenProtected.post("createPost", use: createPost)
+        tokenProtected.put("editPost", use: editPost)
+        
     }
     
     
@@ -55,29 +58,26 @@ class PostController: RouteCollection {
                 .range(listPostsRequest.startIndex..<listPostsRequest.count).all() //Take [count] posts, starting at the [startIndex]-th, only listing posts marked as resolved.
             
             }.map(to: [Post.Public].self) { postArray in //Then convert all these posts to the public representation.
-                var publicPosts = [Post.Public]()
-                publicPosts.reserveCapacity(postArray.count) //Probably not a necessary line...
-                
-                postArray.forEach { publicPosts.append($0.publicize()) } //Append the public version of each post to the publicPosts array.
-                
+              
+                let publicPosts =  postArray.map{ $0.publicize() } //Map the Posts to Post.Publics.
                 return publicPosts //Return the posts.
         }
     }
     
     //Create a post.
-    func createPost(_ req: Request) throws -> Future<Status> {
+    func createPost(_ req: Request) throws -> Future<HTTPResponse> {
         let user = try req.requireAuthenticated(User.self) //Get the user posting this.
         
         return try req.content.decode(Post.Public.self).flatMap(to: Post.self) { incomingPost in
             //See the designated initializer in Post.swift to modify this.
             let newPost = try Post(byUser: user, fromIncomingPostPublic: incomingPost)
             return newPost.save(on: req)
-        }.returnOkayStatus() //For now, just return a dumb okay status. Something more useful can be implemented later...
+        }.returnOkay() //For now, just return a dumb okay status. Something more useful can be implemented later...
         
     }
     
     //Edit an existing post.
-    func editPost(_ req: Request) throws -> Future<Status> {
+    func editPost(_ req: Request) throws -> Future<HTTPResponse> {
         let user = try req.requireAuthenticated(User.self) //Get the user attempting to edit a post.
         
         return try req.content.decode(Post.Public.self).flatMap(to: (Post?, Post.Public).self) { incomingPost in
@@ -99,15 +99,18 @@ class PostController: RouteCollection {
                 throw Abort(.unauthorized, reason: "You cannot edit someone else's posts.")
             }
             
+            //Do we want titles to be edited?
+            //post.title = incomingPost.title
+            
             //After all these checks, let's actually edit the textContent.
             post.textContent = incomingPost.textContent
             
             //Save the post now.
             return post.save(on: req)
-        }.returnOkayStatus() //Return the dumb Okay Status for now.
-    }
+        }.returnOkay() //Return the dumb Okay Status for now.
+
     
-    //func markPostAsResolved(){} //Take in a Post.ID, and if the requesting user posted this post, then mark this post as resolved by adding the resolvedAt date.
+    func markPostAsResolved(){} //Take in a Post.ID, and if the requesting user posted this post, then mark this post as resolved by adding the resolvedAt date.
     
     //func deletePost(){} //Permanently delete a post.
     
