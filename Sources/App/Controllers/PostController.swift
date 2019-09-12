@@ -108,13 +108,13 @@ class PostController: RouteCollection {
             //Save the post now.
             return post.save(on: req)
         }.returnOkay() //Return the dumb Okay Status for now.
-
+    }
     
-    func markPostAsResolved(){} //Take in a Post.ID, and if the requesting user posted this post, then mark this post as resolved by adding the resolvedAt date.
+    
+    
+    //func markPostAsResolved(){} //Take in a Post.ID, and if the requesting user posted this post, then mark this post as resolved by adding the resolvedAt date.
     
     //func deletePost(){} //Permanently delete a post.
     
     
-    
 }
-
