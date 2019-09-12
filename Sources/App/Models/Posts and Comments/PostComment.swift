@@ -33,6 +33,13 @@ final class PostComment : PostgreSQLModel {
     // MARK -- Content
     var textContent : String
     
+    //Update and Creation times
+    static let createdAtKey: TimestampKey? = \.createdAt
+    static let updatedAtKey: TimestampKey? = \.updatedAt
+    
+    var createdAt: Date?
+    var updatedAt: Date?
+    
     // MARK -- Points/Likes/Dislikes
     var likingUsers : Siblings<PostComment, User, PostCommentUserPivot>{
         return siblings(related: User.self, through: PostCommentUserPivot.self)
