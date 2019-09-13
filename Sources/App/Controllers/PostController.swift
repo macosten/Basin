@@ -12,9 +12,14 @@ class PostController: RouteCollection {
         let tokenProtected = mainRoute.grouped(tokenAuthMiddleware, guardAuthMiddleware)
         
         //Mark -- Token-protected routes.
-        tokenProtected.get("listActivePosts", use: listActivePosts)
-        tokenProtected.get("listAllPosts", use: listAllPosts)
-        tokenProtected.get("listResolvedPosts", use: listResolvedPosts)
+        tokenProtected.get("post", "listActivePosts", use: listActivePosts)
+        tokenProtected.get("post", "listAllPosts", use: listAllPosts)
+        tokenProtected.get("post", "listResolvedPosts", use: listResolvedPosts)
+        
+        tokenProtected.post("post", "createPost", use: createPost)
+        tokenProtected.patch("post", "editPost", use: editPost)
+        tokenProtected.patch("post", "markPostAsUnresolved", use: markPostAsUnresolved)
+        tokenProtected.delete("post", "deletePost", use: deletePost)
         
     }
     
@@ -78,6 +83,7 @@ class PostController: RouteCollection {
     
     //Edit an existing post.
     func editPost(_ req: Request) throws -> Future<Status> {
+        //This is how we'll edit a post in almost any way -- except it's not how we'll unresolve a resolved post. That (for now) will use a different method, but this can potentially be changed.
         let user = try req.requireAuthenticated(User.self) //Get the user attempting to edit a post.
         
         return try req.content.decode(Post.Public.self).flatMap(to: (Post?, Post.Public).self) { incomingPost in
@@ -89,29 +95,93 @@ class PostController: RouteCollection {
             //Look for a post with that ID.
             return Post.find(getID, on: req).and(result: incomingPost)
         }.flatMap(to: Post.self){ postOptional, incomingPost in
-            //Make sure we found the post.
-            guard let post = postOptional else {
-                throw Abort(.notFound, reason: "A post with that database ID was not found.")
-            }
+            //Check the user's ability to edit this post.
+            let post = try self.checkUserCanEditPostOptional(user, forEditingPostOptional: postOptional)
             
-            //A user may only edit their own posts.
-            if post.userID != user.id {
-                throw Abort(.unauthorized, reason: "You cannot edit someone else's posts.")
-            }
+            //Now, all of our checks should be complete. We will begin modifying the post itself now.
             
-            //After all these checks, let's actually edit the textContent.
-            post.textContent = incomingPost.textContent
+            //Should we allow people to edit titles? For now, we will; if not, delete this line.
+            if let incomingTitle = incomingPost.title { post.title = incomingTitle }
+            
+            //Now, let's actually edit the textContent, if it was specified.
+            if let incomingText = incomingPost.textContent { post.textContent = incomingText }
+            
+            //Now, if a resolvedAt date is specified, mark the post as resolved.
+            if let incomingResolvedAt = incomingPost.resolvedAt { post.resolvedAt = incomingResolvedAt }
+            
+            //Note that createdAt and updatedAt are all handled by Fluent, so we won't touch them.
+            
+            //We don't want User.ID to be modified (for now -- in the future, this might be good to "hand off" a task post to another person).
             
             //Save the post now.
             return post.save(on: req)
         }.returnOkayStatus() //Return the dumb Okay Status for now.
     }
     
-    //func markPostAsResolved(){} //Take in a Post.ID, and if the requesting user posted this post, then mark this post as resolved by adding the resolvedAt date.
+    func markPostAsUnresolved(_ req: Request) throws -> Future<Status>{
+        //This is meant to be a method to erase a Post's resolvedAt date, in case of a mistake or something.
+        
+        let user = try req.requireAuthenticated(User.self) //Get the user attempting to modify the post.
+        
+        return try req.content.decode(Post.Public.self).flatMap(to: (Post?, Post.Public).self) { incomingPost in
+            //The .id field should be filled out to specify the post we actually want to modify.
+            guard let getID = incomingPost.id else {
+                throw Abort(.badRequest, reason: "A database ID was not specified, so the post cannot be found.")
+            }
+            
+            //Look for a post with that ID.
+            return Post.find(getID, on: req).and(result: incomingPost)
+            }.flatMap(to: Post.self){ postOptional, incomingPost in
+                //Check the user's ability to edit this post.
+                let post = try self.checkUserCanEditPostOptional(user, forEditingPostOptional: postOptional)
+                
+                //If we're here, then the above method didn't throw and abort, so we'll set the post's resolvedAt to nil.
+                post.resolvedAt = nil
+                
+                return post.save(on: req)
+        }.returnOkayStatus()
+    }
     
-    //func deletePost(){} //Permanently delete a post.
+    func deletePost(_ req: Request) throws -> Future<Status>{
+        //Permanently delete a post. This isn't really something that probably *needs* to happen often, but it's here for completion's sake.
+        let user = try req.requireAuthenticated(User.self) //Get the user attempting to modify the post.
+        
+        return try req.content.decode(Post.Public.self).flatMap(to: (Post?, Post.Public).self) { incomingPost in
+            //The .id field should be filled out to specify the post we actually want to modify.
+            guard let getID = incomingPost.id else {
+                throw Abort(.badRequest, reason: "A database ID was not specified, so the post cannot be found.")
+            }
+            
+            //Look for a post with that ID.
+            return Post.find(getID, on: req).and(result: incomingPost)
+            }.flatMap(to: Void.self) { postOptional, incomingPost in
+                //Check the user's ability to edit this post.
+                let post = try self.checkUserCanEditPostOptional(user, forEditingPostOptional: postOptional)
+                
+                //If we're here, then the above method didn't throw and abort, so we'll delete the post immediately.
+                return post.delete(on: req)
+            }.returnOkayStatus()
+    }
+    
     
     
     
 }
 
+
+// MARK -- Non-route methods
+extension PostController {
+    
+    //Check to see if the passed-in user can edit the post. To be used in methods that want to edit a post somehow.
+    func checkUserCanEditPostOptional(_ user: User, forEditingPostOptional postOptional: Post?) throws -> Post {
+        //Make sure we found the post.
+        guard let post = postOptional else { throw Abort(.notFound, reason: "A post with that database ID was not found.") }
+        
+        //A user may only edit their own posts.
+        if post.userID != user.id { throw Abort(.unauthorized, reason: "You cannot edit someone else's posts.") }
+        
+        
+        //If we're authorized to edit the post, we'll return it.
+        return post
+    }
+}

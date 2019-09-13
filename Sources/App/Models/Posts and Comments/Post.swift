@@ -62,11 +62,13 @@ final class Post : PostgreSQLModel {
     struct Public : Content {
         let id : Int?
         
-        let userID : User.ID? // Don't necessarily require the userID when getting this from the client; we can get the user that's posting this from the fact that they're logged in with requireAuthenticated()
+        let userID : User.ID? // Don't necessarily require the userID when getting this from the client; we can get the user that's posting this from the fact that they're logged in with requireAuthenticated().
+        //This is one thing that should never be modified.
         
-        let title : String
+        let title : String?
+        //All of these are optional to allow the more intuitive use of PATCH for the URL method that edits a post.
         
-        let textContent : String
+        let textContent : String?
         //let pictureContent : ???
         //let videoContent : ???
         
@@ -93,8 +95,14 @@ final class Post : PostgreSQLModel {
     
     init(byUser user: User, fromIncomingPostPublic incomingPost: Post.Public) throws {
         self.userID = try user.requireID()
-        self.title = incomingPost.title
-        self.textContent = incomingPost.textContent
+        
+        //Check that the incoming title and text content exist; for now, they're the only things that are 100% necessary.
+        guard let incomingTitle = incomingPost.title else { throw Abort(.badRequest, reason: "A new post needs a title.") }
+        
+        guard let incomingTextContent = incomingPost.textContent else { throw Abort(.badRequest, reason: "A new post needs test content.") }
+        
+        self.title = incomingTitle
+        self.textContent = incomingTextContent
     }
     
 }
