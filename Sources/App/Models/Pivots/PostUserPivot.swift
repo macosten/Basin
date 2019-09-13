@@ -22,9 +22,14 @@ struct PostUserPivot : PostgreSQLModel, ModifiablePivot {
     var postID: Int
     var userID: Int
     
+    var userLikesPost: Bool? //Nil for no relation, True for like, False for dislike
+    var userInvolvedInPost: Bool //False for default (uninvolved), True for involved
+    
     init(_ left: Post, _ right: User) throws {
         postID = try left.requireID()
         userID = try right.requireID()
+        
+        userInvolvedInPost = false
     }
     
 }
