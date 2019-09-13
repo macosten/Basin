@@ -58,17 +58,16 @@ final class Post : PostgreSQLModel {
         return children(\PostComment.id)
     }
     
-    //The data sent to or from a client, as a struct.
+    //The data sent to a client, as a struct.
     struct Public : Content {
         let id : Int?
         
-        let userID : User.ID? // Don't necessarily require the userID when getting this from the client; we can get the user that's posting this from the fact that they're logged in with requireAuthenticated().
-        //This is one thing that should never be modified.
+        let userID : User.ID
         
-        let title : String?
+        let title : String
         //All of these are optional to allow the more intuitive use of PATCH for the URL method that edits a post.
         
-        let textContent : String?
+        let textContent : String
         //let pictureContent : ???
         //let videoContent : ???
         
@@ -88,12 +87,36 @@ final class Post : PostgreSQLModel {
         }
     }
     
+    //The data sent from a client.
+    struct Incoming : Content {
+        let id : Int?
+        
+        let userID : User.ID?
+        
+        let title : String?
+        //All of these are optional to allow the more intuitive use of PATCH for the URL method that edits a post.
+        
+        let textContent : String?
+        //let pictureContent : ???
+        //let videoContent : ???
+        
+        let resolvedAt: Date?
+        
+        init(fromPost post: Post) {
+            self.id = post.id
+            self.title = post.title
+            self.userID = post.userID
+            self.textContent = post.textContent
+            self.resolvedAt = post.resolvedAt
+        }
+    }
+    
     //A convenience function to create a Post.Public from a Post.
     func publicize() -> Post.Public {
         return Post.Public(fromPost: self)
     }
     
-    init(byUser user: User, fromIncomingPostPublic incomingPost: Post.Public) throws {
+    init(byUser user: User, fromIncomingPost incomingPost: Post.Incoming) throws {
         self.userID = try user.requireID()
         
         //Check that the incoming title and text content exist; for now, they're the only things that are 100% necessary.

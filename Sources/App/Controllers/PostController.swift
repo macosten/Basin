@@ -73,9 +73,9 @@ class PostController: RouteCollection {
     func createPost(_ req: Request) throws -> Future<Status> {
         let user = try req.requireAuthenticated(User.self) //Get the user posting this.
         
-        return try req.content.decode(Post.Public.self).flatMap(to: Post.self) { incomingPost in
+        return try req.content.decode(Post.Incoming.self).flatMap(to: Post.self) { incomingPost in
             //See the designated initializer in Post.swift to modify this.
-            let newPost = try Post(byUser: user, fromIncomingPostPublic: incomingPost)
+            let newPost = try Post(byUser: user, fromIncomingPost: incomingPost)
             return newPost.save(on: req)
         }.returnOkayStatus() //For now, just return a dumb okay status. Something more useful can be implemented later...
         
@@ -86,7 +86,7 @@ class PostController: RouteCollection {
         //This is how we'll edit a post in almost any way -- except it's not how we'll unresolve a resolved post. That (for now) will use a different method, but this can potentially be changed.
         let user = try req.requireAuthenticated(User.self) //Get the user attempting to edit a post.
         
-        return try req.content.decode(Post.Public.self).flatMap(to: (Post?, Post.Public).self) { incomingPost in
+        return try req.content.decode(Post.Incoming.self).flatMap(to: (Post?, Post.Incoming).self) { incomingPost in
             //The .id field should be filled out to specify the post we actually want to modify.
             guard let getID = incomingPost.id else {
                 throw Abort(.badRequest, reason: "A database ID was not specified, so the post cannot be found.")
@@ -123,7 +123,7 @@ class PostController: RouteCollection {
         
         let user = try req.requireAuthenticated(User.self) //Get the user attempting to modify the post.
         
-        return try req.content.decode(Post.Public.self).flatMap(to: (Post?, Post.Public).self) { incomingPost in
+        return try req.content.decode(Post.Incoming.self).flatMap(to: (Post?, Post.Incoming).self) { incomingPost in
             //The .id field should be filled out to specify the post we actually want to modify.
             guard let getID = incomingPost.id else {
                 throw Abort(.badRequest, reason: "A database ID was not specified, so the post cannot be found.")
@@ -146,7 +146,7 @@ class PostController: RouteCollection {
         //Permanently delete a post. This isn't really something that probably *needs* to happen often, but it's here for completion's sake.
         let user = try req.requireAuthenticated(User.self) //Get the user attempting to modify the post.
         
-        return try req.content.decode(Post.Public.self).flatMap(to: (Post?, Post.Public).self) { incomingPost in
+        return try req.content.decode(Post.Incoming.self).flatMap(to: (Post?, Post.Incoming).self) { incomingPost in
             //The .id field should be filled out to specify the post we actually want to modify.
             guard let getID = incomingPost.id else {
                 throw Abort(.badRequest, reason: "A database ID was not specified, so the post cannot be found.")
