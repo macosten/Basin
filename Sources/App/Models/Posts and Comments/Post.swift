@@ -22,6 +22,10 @@ final class Post : PostgreSQLModel {
         return parent(\.userID)
     }
     
+    var username : String // I'm still going to keep track of the name of the user posting this.
+    //If they choose to change their name at a later time, it might be worth just running an operation
+    //on all posts they own that changes this property.
+    
     //Content of a post -- this is subject to the most change.
     //var hyperlinkContent : String?
     var textContent : String
@@ -64,26 +68,29 @@ final class Post : PostgreSQLModel {
         
         let userID : User.ID
         
+        let username : String
+        
         let title : String
-        //All of these are optional to allow the more intuitive use of PATCH for the URL method that edits a post.
         
         let textContent : String
         //let pictureContent : ???
         //let videoContent : ???
         
+        // TODO: -- Implement this on the client side.
         let createdAt: Date?
         let updatedAt: Date?
-        let resolvedAt: Date?
+        //let resolvedAt: Date?
         
         
         init(fromPost post: Post) {
             self.id = post.id
             self.title = post.title
             self.userID = post.userID
+            self.username = post.username
             self.textContent = post.textContent
             self.createdAt = post.createdAt
             self.updatedAt = post.updatedAt
-            self.resolvedAt = post.resolvedAt
+            //self.resolvedAt = post.resolvedAt
         }
     }
     
@@ -125,6 +132,7 @@ final class Post : PostgreSQLModel {
         guard let incomingTextContent = incomingPost.textContent else { throw Abort(.badRequest, reason: "A new post needs test content.") }
         
         self.title = incomingTitle
+        self.username = user.name
         self.textContent = incomingTextContent
     }
     
